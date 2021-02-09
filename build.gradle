@@ -1,0 +1,95 @@
+plugins {
+    id 'java'
+    id "org.openapi.generator" version "4.3.1"
+}
+
+group 'be.kevinbaes'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+sourceSets {
+    ext.helloDir = "$rootDir/build/hello_client/src/main/java"
+    ext.goodbyeDir = "$rootDir/build/goodbye_client/src/main/java"
+    main.java.srcDirs += "$helloDir"
+    main.java.srcDirs += "$goodbyeDir"
+    test.java.srcDirs += "$helloDir"
+    test.java.srcDirs += "$goodbyeDir"
+}
+
+task buildHelloClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    validateSpec = true
+    inputSpec = "$rootDir/openapi/hello_openapi.yaml"
+    generatorName = "java"
+    library = "resttemplate"
+    modelPackage = "be.kevinbaes.hello_world_client.generated.model"
+    apiPackage = "be.kevinbaes.hello_world_client.generated.api"
+    invokerPackage = "be.kevinbaes.hello_world_client.generated"
+    configOptions = [
+        dateLibrary: "java8"
+    ]
+    outputDir = "$buildDir/hello_client"
+}
+
+task buildGoodbyeClient(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+    validateSpec = true
+    inputSpec = "$rootDir/openapi/goodbye_openapi.yaml"
+    generatorName = "java"
+    library = "resttemplate"
+    modelPackage = "be.kevinbaes.goodbye_client.generated.model"
+    apiPackage = "be.kevinbaes.goodbye_client.generated.api"
+    invokerPackage = "be.kevinbaes.goodbye_client.generated"
+    configOptions = [
+        dateLibrary: "java8"
+    ]
+    outputDir = "$buildDir/goodbye_client"
+}
+
+task generateClients {
+    dependsOn = ["buildHelloClient", "buildGoodbyeClient"]
+}
+
+task cleanGenerateApi {
+    dependsOn = ["clean", "generateClients"]
+}
+
+compileJava.dependsOn = ["generateClients"]
+
+task cleanOpenApi {
+    dependsOn = ["clean"]
+}
+
+// generated client deps
+ext {
+    swagger_annotations_version = "1.5.22"
+    jackson_version = "2.10.3"
+    jackson_databind_version = "2.10.3"
+    jackson_databind_nullable_version = "0.2.1"
+    spring_web_version = "4.3.9.RELEASE"
+    jodatime_version = "2.9.9"
+    junit_version = "4.13"
+}
+
+dependencies {
+    implementation "javax.annotation:javax.annotation-api:1.3.1"
+    implementation "io.swagger:swagger-annotations:$swagger_annotations_version"
+    implementation "com.google.code.findbugs:jsr305:3.0.2"
+    implementation "org.springframework:spring-web:$spring_web_version"
+    implementation "com.fasterxml.jackson.core:jackson-core:$jackson_version"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:$jackson_version"
+    implementation "com.fasterxml.jackson.core:jackson-databind:$jackson_databind_version"
+    implementation "com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:$jackson_version"
+    implementation "org.openapitools:jackson-databind-nullable:$jackson_databind_nullable_version"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson_version"
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "io.specto:hoverfly-java:0.14.0"
+}

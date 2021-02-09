@@ -1,0 +1,55 @@
+openapi: '3.0.2'
+info:
+  title: Hello OpenAPI
+  version: '1.0'
+servers:
+  - url: https://localhost:8080/v1
+paths:
+  /hello/{name}:
+    get:
+      operationId: getHelloMessage
+      summary: Says hello
+      parameters: 
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 'world'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain: 
+              schema:
+                type: string
+                example: Hello world!
+  /hello/template:
+    post:
+      operationId: createHelloTemplate
+      summary: modify the hello template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HelloTemplate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HelloTemplate'
+components:
+  schemas:
+    HelloTemplate:
+      type: object
+      properties:
+        prefix:
+          type: string
+        suffix:
+          type: string
+      required:
+        - prefix
+        - suffix

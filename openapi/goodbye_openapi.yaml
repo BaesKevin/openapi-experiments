@@ -1,0 +1,55 @@
+openapi: '3.0.2'
+info:
+  title: Goodbye OpenAPI
+  version: '1.0'
+servers:
+  - url: https://localhost:8081/v1
+paths:
+  /goodbye/{name}:
+    get:
+      operationId: getGoodbyeMessage
+      summary: Says goodbye
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 'world'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Goodbye world!
+  /goodbye/template:
+    post:
+      operationId: createGoodbyeTemplate
+      summary: modify the goodbye template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GoodByeTemplate'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GoodByeTemplate'
+components:
+  schemas:
+    GoodByeTemplate:
+      type: object
+      properties:
+        prefix:
+          type: string
+        suffix:
+          type: string
+      required:
+        - prefix
+        - suffix
